@@ -357,12 +357,17 @@ void initDFAStateTable()
 {
     for (int i = 0; i < MAX; i++)
     {
+        
+
         if (DFANodes[i].id >= 0)
         {
+        
             for (char c : allowed_chars)
             {
-                if (DFANodes[i].ptrs[c] != NULL)
+              
+                if (DFANodes[i].ptrs.find(c) != DFANodes[i].ptrs.end())
                 {
+                   
                     int tempid = DFANodes[i].ptrs[c]->id;
                     DFAStateTable[i][c].insert(tempid);
                 }
@@ -394,10 +399,27 @@ int main() {
    int state=NFAtoDFATable(&node0);
    constructDFA(state);
    printDFA();
+
    initDFAStateTable();
+   //cout<<DFANodes[0].ptrs.
    printDFATable();
-   if(DFANodes[0].ptrs['c']==NULL)
-       cout<<"null";
+  /* if(DFANodes[0].ptrs['c']==NULL)
+       cout<<"null";*/
+
+   // for (const auto& pair : DFANodes[0].ptrs) {
+   //    cout << "   !!!!!!!! " << pair.first << ": " << pair.second->id << endl;  // 假设这里 pair.second 指向的 DFANode 已经初始化
+   //}
+
+   for (const auto& pair : DFANodes[3].ptrs)
+   {
+       char input_char = pair.first;
+       DFANode* target_node = pair.second;
+
+       if (input_char != '\0') { // Check if char is not empty
+           // Do something with input_char and target_node
+           std::cout << "Input char: " << input_char << ", Target Node ID: " << target_node->id << std::endl;
+       }
+   }
     return 0;
 }
 
