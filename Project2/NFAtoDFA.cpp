@@ -396,8 +396,8 @@ int main() {
    printDFA();
    initDFAStateTable();
    printDFATable();
-   //if(DFANodes[0].ptrs['c']==NULL)
-   //    cout<<"null";
+   if(DFANodes[0].ptrs['c']==NULL)
+       cout<<"null";
     return 0;
 }
 
