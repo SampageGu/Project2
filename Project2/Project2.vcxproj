@@ -140,9 +140,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="LexRuleReader.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="NFA.cpp" />
     <ClCompile Include="NFAtoDFA.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LexParser.h" />
+    <ClInclude Include="LexRuleReader.h" />
+    <ClInclude Include="NFA.h" />
     <ClInclude Include="NFAtoDFA.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
