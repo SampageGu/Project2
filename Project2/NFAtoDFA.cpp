@@ -6,7 +6,6 @@
 #include <iostream>
 using namespace std;
 #define CHAR_NULL 127
-
 #define MAX 99
 struct NFANode {
 	int id = -1;  //id为负表示没有被初始化
@@ -29,12 +28,16 @@ vector<char> allowed_chars;//对应ASCII码，记录可以输入的字符
 NFANode nfanodes[MAX]; // 存储所有的 NFANode 对象
 void printNFAtable();
 int mDFA[MAX];          //用来存储结点合并 比如mDFA[2]=0,表示状态2可以和状态0合并，初始化为-1
-bool isFinal[MAX];   //用来记录每个状态是否是终态
+set<int>NFAFinalState;//用来记录NFA的终态
+bool isDFAFinal[MAX];   //用来记录每个DFA状态是否是终态，初始化为0
 void initmDFA() {
 	for (int i = 0; i < MAX; i++)
 	{
 		mDFA[i] = -1;
+		isDFAFinal[i] = 0;
+		//isNFAFinal[i] = 0;
 	}
+
 }
 int REpos[65536];//记录节点对应的执行语句
 void initallow_chars() {
@@ -98,7 +101,8 @@ NFANode initNFA2()
 	node7.id = 7; node7.input1 = 'a';
 	node8.id = 8; node8.input1 = 'b';
 	node9.id = 9; node9.input1 = node9.input2 = CHAR_NULL; // 终点状态，没有出度
-
+	
+	NFAFinalState.insert(9);
 	// 添加到nfanodes中
 	nfanodes[0] = node0;
 	nfanodes[1] = node1;
@@ -219,7 +223,14 @@ int NFAtoDFATable(NFANode* startNode) {
 				}
 				//新状态放入状态表中
 				if (newOne) {
-					epolisonSet[++last_state_idx] = table;
+					last_state_idx++;
+					epolisonSet[last_state_idx] = table;
+					vector<int> intersection;
+					set_intersection(table.begin(), table.end(), NFAFinalState.begin(),NFAFinalState.end(), back_inserter(intersection));   //将闭包与NFA的终态map取交集 
+					if (!intersection.empty()) { //如果不为空，那么说明该DFA状态是终态
+						cout << "找到了！！！！！！！！！"<<last_state_idx << endl; 
+						isDFAFinal[last_state_idx] = 1;
+					}
 				}
 			}
 		}
@@ -228,7 +239,6 @@ int NFAtoDFATable(NFANode* startNode) {
 	printNFAtable();
 	return last_state_idx + 1;
 }
-
 void printNFAtable()
 {
 	std::cout << "Non-empty elements in epolisonSet:" << std::endl;
@@ -257,7 +267,6 @@ void printNFAtable()
 	}
 
 }
-
 //构建DFA图
 //变量：stateCnt为DFA状态数量
 void constructDFA(int stateNum) {
@@ -386,21 +395,17 @@ void printDFATable()
 		}
 	}
 }
-
-void initisFinal()
-{
-}
 void miniDFA()
 {
 	for (int i = 0; i < MAX; i++)
 	{
-		if (DFANodes[i].istrue== 1)              //id=-1说明本DFANode没有被定义 
+		if (DFANodes[i].istrue== 1)              //istrue!=1说明本DFANode没有被定义 
 		{
 
 			for (int j = i + 1; j < MAX; j++)
 			{
 				bool canMerge = true;
-				if (DFANodes[j].istrue== 1)
+				if (DFANodes[j].istrue== 1&&isDFAFinal[j]!=1)          //isDFAFinal说明该节点不是终态
 				{
 					//cout << "j id" << DFANodes[j].id << endl;
 
@@ -432,42 +437,27 @@ void miniDFA()
 					if (canMerge)
 					{
 						mDFA[j] = i;
-						cout << i << "和" << j << "合并" << endl;
-						cout << DFANodes[i].id << " " << DFANodes[j].id << endl;
+						
+						//cout << DFANodes[i].id << " " << DFANodes[j].id << endl;
 						DFANodes[i].ptrs.insert(DFANodes[j].ptrs.begin(), DFANodes[j].ptrs.end());
 						
-						cout << DFANodes[0].ptrs['b']->id << endl;
-						/*for (int k = i; k < MAX; k++)
-						{
-							if (DFANodes[k].id >= 0)
-							{
-								cout << "!" << endl;
-								for (char c : allowed_chars)
-								{
-									cout << DFANodes[k].ptrs[c]->id << endl;
-									if (DFANodes[k].ptrs[c]->id == j)
-									{
-										cout <<"!"<< j << endl;
-										DFANodes[k].ptrs[c]->id = i;
-									}
-								}
-							}
-							
-						}*/
+						//cout << DFANodes[0].ptrs['b']->id << endl;
+			
 						DFANodes[j].istrue =0;
-						// printDFA();
-						cout << "finish merge" << endl;
+						
+						
 					}
 				}
 				
 
 
 			}
-			//cout << "!!" << endl;
+
 
 		}
 	}
 }
+
 int main()
 {
 	initmDFA();
@@ -478,26 +468,10 @@ int main()
 	cout << "这里输出状态" << state << endl;
 	constructDFA(state);
 	printDFA();
-
 	initDFAStateTable();
-	
 	printDFATable();
-	for (int i = 0; i < 10; i++)
-	{
-		cout << DFANodes[i].id << " ";
-	}
-	cout << endl;
 	miniDFA();
-
-
 	printDFA();
-
-	// for (const auto& pair : DFANodes[0].ptrs) {
-	//    cout << "   !!!!!!!! " << pair.first << ": " << pair.second->id << endl;  
-	//    // 假设这里 pair.second 指向的 DFANode 已经初始化
-	//}
-
-
 	return 0;
 }
 
