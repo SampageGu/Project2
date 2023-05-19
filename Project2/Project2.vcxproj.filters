@@ -18,9 +18,18 @@
     <ClCompile Include="NFAtoDFA.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\QQ文件\NFA.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NFAtoDFA.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\QQ文件\NFA.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\QQ文件\LexParser.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

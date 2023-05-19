@@ -140,9 +140,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\QQ文件\NFA.cpp" />
     <ClCompile Include="NFAtoDFA.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\QQ文件\LexParser.h" />
+    <ClInclude Include="..\..\..\..\QQ文件\NFA.h" />
     <ClInclude Include="NFAtoDFA.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
