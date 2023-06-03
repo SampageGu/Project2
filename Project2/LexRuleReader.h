@@ -79,7 +79,7 @@ public:
 	}
 	//对文件中的单行正规表达式进行解析
 	RegularExpression parseRE(string str) {
-		regex pattern("\\s+\\{([\\s|\\S]+?)\\}");
+		regex pattern("\\s+\\{([\\s|\\S]+)\\}");
 		smatch match;
 		RegularExpression RE = RegularExpression();
 		if (regex_search(str, match, pattern)) {

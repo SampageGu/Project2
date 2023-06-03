@@ -123,7 +123,7 @@ pair<NFANode*, NFANode*> opNFA::REtoNFA(string RE, string REop)
 					opStack.pop();
 					if (opStack.empty())
 					{
-						cout << "!!!!!!!"<<endl;
+						cout << "!!!!!!!" << endl;
 						cout << RE;
 					}
 					opTemp = opStack.top();
@@ -211,8 +211,8 @@ NFANode* opNFA::mergeNFA() {
 		newStart->input2 = '\0';
 		newStart->convert2 = start2;
 		NFAStack.push({ newStart,newStart });
-		cout << 1;
 	}
+
 }
 
 void opNFA::debugNFA(NFANode* NFA) {
@@ -241,7 +241,7 @@ void opNFA::debugNFA(NFANode* NFA) {
 		}
 		tempStack.pop();
 	}
-	
+
 }
 
 

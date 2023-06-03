@@ -35,12 +35,12 @@ struct LexParser
 				break;
 			}
 			//x可以是运算符，中括号或大括号转换后结果，不可以是'\\'（第一个是转义字符）
-			if(x != '\\')
-			rel += x;
+			if (x != '\\')
+				rel += x;
 
 			//表达式中若有'\'符号，则x == '\\'（增加了转义字符）
 			//文件存进string时，字符串‘\n’存成‘\\n’，此时需要把第一个\去掉
-			if (x == '\\' && i+1 < s.length()) {
+			if (x == '\\' && i + 1 < s.length()) {
 				char temp = s[++i];
 				switch (temp)
 				{
@@ -57,10 +57,10 @@ struct LexParser
 					rel += '\t';		//加上前面加入的'\'组成'\t'
 					break;
 				case 'v':
-					rel +='\v';
+					rel += '\v';
 					break;
 				case 'f':
-					rel +='\f';		//e.g.	文件中是'\f',这里存进去是'\\f'，前两个\表示'\',显示出来就是'\f'
+					rel += '\f';		//e.g.	文件中是'\f',这里存进去是'\\f'，前两个\表示'\',显示出来就是'\f'
 					break;			//第一个是转义符,第二个才是真实数据。			
 				default:
 					rel += '\\'; rel += temp;	//e.g.  文件中的'\\',看上去是两个\,其实存进去是四个\.
@@ -92,8 +92,8 @@ struct LexParser
 			//replaceByRD(singleRE, (char)(Brace_left)+ p.first + (char)(Brace_right), p.second);
 			replaceByRD(singleRE, p.first, p.second);
 		}
-			return singleRE;
-		}
+		return singleRE;
+	}
 
 	//替换单个中括号，将里面对应的字符进行展开，通过ASCII码进行实现
 	//变量：str为要进行替换的字符串
@@ -104,18 +104,11 @@ struct LexParser
 		for (int i = 0; i < str.length(); i++) {
 			char c = str[i];
 			//由于”\\“存储成”\\\\“，故需要额外处理
-			if (c == '\\') {
-				++i;
-				c = str[i];
-				queue.push(c);
-				tmp.push_back(c);
-				continue;
-			}
 			//e.g. [0-9]，将中间链接符进行替换
 			if (c == '-') { queue.push(CHAR_link_bar); tmp.push_back(c); }
 			else { queue.push(c); tmp.push_back(c); }
 		}
-		str = tmp;		
+		str = tmp;
 		string rel = "";
 
 		char first = str[0];
@@ -125,10 +118,10 @@ struct LexParser
 				//将可输入的ASCII位全部置为1
 				ASCcode[i] = 1;
 			}
-			string inverseRel = singleBracketReplaceAU(queue);			 
+			string inverseRel = singleBracketReplaceAU(queue);
 			for (int i = 0; i < inverseRel.length(); i++) {
-				if(inverseRel[i] != '\|')
-				ASCcode[inverseRel[i]] = 0;		//需要去掉的符号
+				if (inverseRel[i] != '\|')
+					ASCcode[inverseRel[i]] = 0;		//需要去掉的符号
 			}
 			/*for (int i = 0; i < str.length(); i++) {
 				if (str[i] == CHAR_link_bar) {
@@ -182,7 +175,7 @@ struct LexParser
 			if (!queue.empty()) {
 				second = queue.front();
 			}
-			if (second == CHAR_link_bar && second != '不') {   //展开0-9，a-z等
+			if (second == CHAR_link_bar && second != '不' && queue.size() > 1) {   //展开0-9，a-z等
 				queue.pop();  //pop掉second
 				if (!queue.empty()) {
 					third = queue.front();
@@ -190,27 +183,27 @@ struct LexParser
 				}
 				//char third = queue.front();
 				//queue.pop();
-				if(third != '不')
-				for (auto i = first; i <= third; i++) {  //char型也可以
-					char a = i;
-					switch (a) {
-					case '(':
-					case '|':
-					case ')':
-					case '+':
-					case '?':
-					case '*':
-					case '.':
-					case '\\':
-						//代表特殊字符
-						rel = rel + '\\' + a + '|';
-						break;
-					default:
-						rel = rel + a + '|';
-						break;
+				if (third != '不')
+					for (auto i = first; i <= third; i++) {  //char型也可以
+						char a = i;
+						switch (a) {
+						case '(':
+						case '|':
+						case ')':
+						case '+':
+						case '?':
+						case '*':
+						case '.':
+						case '\\':
+							//代表特殊字符
+							rel = rel + '\\' + a + '|';
+							break;
+						default:
+							rel = rel + a + '|';
+							break;
+						}
+						//rel = rel + i + '|';
 					}
-					//rel = rel + i + '|';
-				}
 			}
 			else {
 				switch (first) {
@@ -234,7 +227,7 @@ struct LexParser
 		}
 		return rel;
 	}
-	
+
 	//将RE中的[]全部展开，变成对应的字符
 	//变量：str为要进行替换的字符串
 	//
@@ -266,7 +259,7 @@ struct LexParser
 	static string replaceDots(string str) {
 		int index = -1;
 		for (int i = 0; i < str.length(); i++) {
-			//由于“\\"在经过quoteFiler后会变成”\\\\"，故后移两位（“\\"代表输出”\"）
+			//'\.'存储会变成'\\\.'所以需要跳过一个
 			if (str[i] == '\\')
 				i += 2;
 			if (str[i] == '.') {
@@ -286,6 +279,7 @@ struct LexParser
 	static string otherFilter(string singleRE, const map<string, string>& RDmap) {
 		singleRE = simplyCharacters(singleRE);
 		singleRE = allReplaceByRD(singleRE, RDmap);
+		singleRE = allReplaceByRD(singleRE, RDmap);		//因为对{E}和{P}来说，转变一次后还有{D}，所以要两次
 		singleRE = replaceDots(singleRE);
 		singleRE = replaceBracketPairs(singleRE);
 		return singleRE;

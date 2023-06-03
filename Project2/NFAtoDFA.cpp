@@ -19,13 +19,13 @@
 //	bool istrue=0;
 //	int id = -1;
 //	int pos = 0;
-//	map<char, DFANode*> ptrs;//转移方向
+//	map<char, DFANode*> transfer;//转移方向
 //} DFANodes[MAX];
 //set<int> epolisonSet[MAX];//记录所有闭包集合，表格左边的部分  如epolisonSet[1]表示1可以到达的所有闭包
 //map<char, set<int> > NFAStateTable[MAX];
 ////记录所有目标状态，char指输入的字符，set指转移后的闭包结果  Statetable[1]['a']表示1状态在接受a字符后可以到达的闭包
 //map<char, set<int>>DFAStateTable[MAX];
-//vector<char> allowed_chars;//对应ASCII码，记录可以输入的字符
+//vector<char> totalChars;//对应ASCII码，记录可以输入的字符
 //NFANode NFANodes[MAX]; // 存储所有的 NFANode 对象
 //void printNFAtable();
 //int mDFA[MAX];          //用来存储结点合并 比如mDFA[2]=0,表示状态2可以和状态0合并，初始化为-1
@@ -41,11 +41,11 @@
 //
 //}
 //int REpos[65536];//记录节点对应的执行语句
-//void initallow_chars() {
+//void initTotalChars() {
 //	for (int i = 9; i < 127; ++i) {
 //		if (true/*i != '#'*/) {
 //			//记录下ASCII码
-//			allowed_chars.push_back(i);
+//			totalChars.push_back(i);
 //		}
 //	}
 //	memset(REpos, 0, sizeof REpos);
@@ -190,7 +190,7 @@
 //		//目标转移状态
 //		auto& tgtTable = NFAStateTable[i];
 //		//遍历可使用的ASCII码
-//		for (char c : allowed_chars)
+//		for (char c : totalChars)
 //		{
 //			//获取能够接受目标字符的状态
 //			auto& table = tgtTable[c];
@@ -270,7 +270,7 @@
 //}
 ////构建DFA图
 ////变量：stateCnt为DFA状态数量
-//void constructDFA(int stateNum) {
+//void DFAgeneration(int stateNum) {
 //	for (int i = 0; i < stateNum; ++i) {
 //		DFANodes[i].id = i;
 //		DFANodes[i].istrue = 1;
@@ -287,7 +287,7 @@
 //		//}
 //		//获得当前状态对应的所有目标状态（表格右边部分）
 //		map<char, set<int> > thisTable = NFAStateTable[i];
-//		for (char c : allowed_chars)
+//		for (char c : totalChars)
 //		{
 //			//判断是否为通路
 //			if (thisTable[c].empty()) continue;
@@ -296,7 +296,7 @@
 //			for (int j = 0; j < stateNum; ++j) {
 //				//寻找到当前节点对应的节点，进行链接
 //				if (tgtState == epolisonSet[j]) {
-//					DFANodes[i].ptrs[c] = &DFANodes[j];
+//					DFANodes[i].transfer[c] = &DFANodes[j];
 //					break;
 //				}
 //			}
@@ -339,8 +339,8 @@
 //			//cout << "DFANode " << i << ": " << endl;
 //			cout << "ID: " << DFANodes[i].id << endl;
 //			/*cout << "POS: " << DFANodes[i].pos << endl;*/
-//			cout << "Ptrs: " << endl;
-//			for (const auto& pair : DFANodes[i].ptrs) {
+//			cout << "transfer: " << endl;
+//			for (const auto& pair : DFANodes[i].transfer) {
 //				if (mDFA[pair.second->id] == -1)
 //				{
 //					cout << "    " << pair.first << ": " << pair.second->id << endl;  // 假设这里 pair.second 指向的 DFANode 已经初始化
@@ -366,13 +366,13 @@
 //		if (DFANodes[i].istrue== 1)
 //		{
 //
-//			for (char c : allowed_chars)
+//			for (char c : totalChars)
 //			{
 //
-//				if (DFANodes[i].ptrs.find(c) != DFANodes[i].ptrs.end())
+//				if (DFANodes[i].transfer.find(c) != DFANodes[i].transfer.end())
 //				{
 //
-//					int tempid = DFANodes[i].ptrs[c]->id;
+//					int tempid = DFANodes[i].transfer[c]->id;
 //					DFAStateTable[i][c].insert(tempid);
 //				}
 //			}
@@ -410,10 +410,10 @@
 //				{
 //					//cout << "j id" << DFANodes[j].id << endl;
 //
-//					for (char c : allowed_chars)
+//					for (char c : totalChars)
 //					{
-//						map<char, DFANode*> pairI = DFANodes[i].ptrs;
-//						map<char, DFANode*> pairJ = DFANodes[j].ptrs;
+//						map<char, DFANode*> pairI = DFANodes[i].transfer;
+//						map<char, DFANode*> pairJ = DFANodes[j].transfer;
 //
 //						// Check if both states have the transition
 //						bool hasTransitionI = pairI.find(c) != pairI.end();
@@ -440,9 +440,9 @@
 //						mDFA[j] = i;
 //						
 //						//cout << DFANodes[i].id << " " << DFANodes[j].id << endl;
-//						DFANodes[i].ptrs.insert(DFANodes[j].ptrs.begin(), DFANodes[j].ptrs.end());
+//						DFANodes[i].transfer.insert(DFANodes[j].transfer.begin(), DFANodes[j].transfer.end());
 //						
-//						//cout << DFANodes[0].ptrs['b']->id << endl;
+//						//cout << DFANodes[0].transfer['b']->id << endl;
 //			
 //						DFANodes[j].istrue =0;
 //						
@@ -462,12 +462,12 @@
 ////int main()
 ////{
 ////	initmDFA();
-////	initallow_chars();
+////	initTotalChars();
 ////	NFANode node0 = initNFA2();
 ////	printNFA();
 ////	int state = NFAtoDFATable(&node0);
 ////	cout << "这里输出状态" << state << endl;
-////	constructDFA(state);
+////	DFAgeneration(state);
 ////	printDFA();
 ////	initDFAStateTable();
 ////	printDFATable();
